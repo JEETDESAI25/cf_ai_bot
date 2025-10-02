@@ -9,6 +9,8 @@ import type { Chat } from "./server";
 import { getCurrentAgent } from "agents";
 import { scheduleSchema } from "agents/schedule";
 
+import Firecrawl from "@mendable/firecrawl-js";
+
 /**
  * Weather information tool that requires human confirmation
  * When invoked, this will present a confirmation dialog to the user
@@ -19,6 +21,11 @@ const getWeatherInformation = tool({
   // Omitting execute function makes this tool require human confirmation
 });
 
+const getTopNews = tool({
+  description: "get the top news from the web",
+  inputSchema: z.object({ topic: z.string() })
+  // Omitting execute function makes this tool require human confirmation
+});
 /**
  * Local time tool that executes automatically
  * Since it includes an execute function, it will run without user confirmation
@@ -117,7 +124,8 @@ export const tools = {
   getLocalTime,
   scheduleTask,
   getScheduledTasks,
-  cancelScheduledTask
+  cancelScheduledTask,
+  getTopNews
 } satisfies ToolSet;
 
 /**
@@ -129,5 +137,41 @@ export const executions = {
   getWeatherInformation: async ({ city }: { city: string }) => {
     console.log(`Getting weather information for ${city}`);
     return `The weather in ${city} is sunny`;
+  },
+  getTopNews: async ({ source }: { source: string }) => {
+    //Source can only be "cnn", "bbc", or "fox" for now
+    if (!["cnn", "bbc", "fox"].includes(source)) {
+      throw new Error("Invalid source");
+    }
+
+    const { agent } = getCurrentAgent<Chat>();
+    if (!agent) {
+      throw new Error("Agent not found");
+    }
+
+    const apiKey = agent.getFirecrawlApiKey();
+    const firecrawl = new Firecrawl({ apiKey });
+
+    let url: string;
+    switch (source) {
+      case "cnn":
+        url = "https://www.cnn.com";
+        break;
+      case "bbc":
+        url = "https://www.bbc.com";
+        break;
+      case "fox":
+        url = "https://www.foxnews.com";
+        break;
+      default:
+        throw new Error("Invalid source");
+    }
+
+    try {
+      const page = await firecrawl.scrape(url, { formats: ["markdown"] });
+      return page.markdown || "No content found";
+    } catch (error) {
+      throw new Error(`Failed to fetch news from ${source}: ${error}`);
+    }
   }
 };
