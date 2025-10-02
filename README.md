@@ -19,7 +19,9 @@ A starter template for building AI-powered chat agents using Cloudflare's Agent 
 ## Prerequisites
 
 - Cloudflare account
-- OpenAI API key
+- **OpenWeatherMap API key** (for weather tool) - [Get free API key](https://openweathermap.org/api)
+- **Firecrawl API key** (for news scraping tool) - [Get free API key](https://www.firecrawl.dev/)
+- OpenAI API key (optional - uses Workers AI by default)
 
 ## Quick Start
 
@@ -37,11 +39,15 @@ npm install
 
 3. Set up your environment:
 
-Create a `.dev.vars` file:
+Create a `.dev.vars` file in the project root:
 
 ```env
-OPENAI_API_KEY=your_openai_api_key
+OPENWEATHERMAP_API_KEY=your_openweathermap_api_key
+FIRECRAWL_API_KEY=your_firecrawl_api_key
+OPENAI_API_KEY=your_openai_api_key  # Optional - only if using OpenAI instead of Workers AI
 ```
+
+> **Note:** This starter uses Cloudflare Workers AI by default (Llama 3 model). OpenAI API key is only needed if you switch to OpenAI models.
 
 4. Run locally:
 
@@ -65,6 +71,31 @@ npm run deploy
 │   ├── utils.ts       # Helper functions
 │   └── styles.css     # UI styling
 ```
+
+## Built-in Tools
+
+This starter comes with several pre-configured tools:
+
+### Auto-Executing Tools (no confirmation needed)
+
+- **`getLocalTime`** - Gets the current local time for a location
+- **`scheduleTask`** - Schedules a task for later execution (one-time, delayed, or recurring via cron)
+- **`getScheduledTasks`** - Lists all scheduled tasks
+- **`cancelScheduledTask`** - Cancels a scheduled task by ID
+
+### Tools Requiring Confirmation
+
+- **`getWeatherInformation`** - Fetches current weather for a city
+  - Uses OpenWeatherMap API
+  - Returns temperature, conditions, humidity, and wind speed
+  - Requires `OPENWEATHERMAP_API_KEY` in environment
+
+- **`getTopNews`** - Scrapes top news from major sources (CNN, BBC, Fox)
+  - Uses Firecrawl API for web scraping
+  - Returns markdown content from news websites
+  - Requires `FIRECRAWL_API_KEY` in environment
+
+Tools requiring confirmation will prompt the user for approval before execution, providing an extra layer of safety for potentially sensitive operations.
 
 ## Customization Guide
 
