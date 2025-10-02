@@ -44,7 +44,7 @@ export class Chat extends AIChatAgent<Env> {
     const workersai = createWorkersAI({ binding: this.env.AI });
 
     // Woker AI Model
-    const model = workersai("@cf/deepseek-ai/deepseek-r1-distill-qwen-32b");
+    const model = workersai("@cf/meta/llama-3-8b-instruct");
 
     // Collect all tools, including MCP tools
     const allTools = {
