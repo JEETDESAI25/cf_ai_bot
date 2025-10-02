@@ -31,6 +31,13 @@ import { tools, executions } from "./tools";
  */
 export class Chat extends AIChatAgent<Env> {
   /**
+   * Public method to get the Firecrawl API key
+   */
+  getFirecrawlApiKey(): string {
+    return this.env.FIRECRAWL_API_KEY;
+  }
+
+  /**
    * Handles incoming chat messages and manages the response stream
    */
   async onChatMessage(
