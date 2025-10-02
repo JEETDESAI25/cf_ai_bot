@@ -38,6 +38,13 @@ export class Chat extends AIChatAgent<Env> {
   }
 
   /**
+   * Public method to get the OpenWeatherMap API key
+   */
+  getOpenWeatherApiKey(): string {
+    return this.env.OPENWEATHERMAP_API_KEY;
+  }
+
+  /**
    * Handles incoming chat messages and manages the response stream
    */
   async onChatMessage(

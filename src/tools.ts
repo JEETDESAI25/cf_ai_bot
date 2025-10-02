@@ -135,8 +135,38 @@ export const tools = {
  */
 export const executions = {
   getWeatherInformation: async ({ city }: { city: string }) => {
-    console.log(`Getting weather information for ${city}`);
-    return `The weather in ${city} is sunny`;
+    const { agent } = getCurrentAgent<Chat>();
+    if (!agent) {
+      throw new Error("Agent not found");
+    }
+
+    const apiKey = agent.getOpenWeatherApiKey();
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`;
+
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        if (response.status === 404) {
+          return `City "${city}" not found. Please check the spelling and try again.`;
+        }
+        throw new Error(`Weather API error: ${response.status}`);
+      }
+
+      const data = (await response.json()) as {
+        name: string;
+        main: { temp: number; feels_like: number; humidity: number };
+        weather: Array<{ description: string; main: string }>;
+        wind: { speed: number };
+      };
+
+      return `Weather in ${data.name}:
+• Temperature: ${data.main.temp}°C (feels like ${data.main.feels_like}°C)
+• Conditions: ${data.weather[0].description}
+• Humidity: ${data.main.humidity}%
+• Wind Speed: ${data.wind.speed} m/s`;
+    } catch (error) {
+      throw new Error(`Failed to fetch weather data: ${error}`);
+    }
   },
   getTopNews: async ({ source }: { source: string }) => {
     //Source can only be "cnn", "bbc", or "fox" for now

@@ -55,12 +55,12 @@ export async function processToolCalls<Tools extends ToolSet>({
           ) as keyof typeof executions;
 
           // Only process tools that require confirmation (are in executions object) and are in 'input-available' state
-          if (!(toolName in executions) || part.state !== "input-available")
+          if (!(toolName in executions) || part.state !== "output-available")
             return part;
 
           let result: unknown;
 
-          if (part.input === APPROVAL.YES) {
+          if (part.output === APPROVAL.YES) {
             // User approved the tool execution
             if (!isValidToolName(toolName, executions)) {
               return part;
@@ -75,7 +75,7 @@ export async function processToolCalls<Tools extends ToolSet>({
             } else {
               result = "Error: No execute function found on tool";
             }
-          } else if (part.input === APPROVAL.NO) {
+          } else if (part.output === APPROVAL.NO) {
             result = "Error: User denied access to tool execution";
           } else {
             // If no approval input yet, leave the part as-is for user interaction

@@ -3,6 +3,7 @@
 declare namespace Cloudflare {
 	interface Env {
 		FIRECRAWL_API_KEY: string;
+		OPENWEATHERMAP_API_KEY: string;
 		Chat: DurableObjectNamespace<import("./src/server").Chat>;
 		AI: Ai;
 	}
